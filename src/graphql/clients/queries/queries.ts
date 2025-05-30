@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const TODAY_POSTS_QUERY = gql`
-  query todayPosts {
-    posts {
+  query Posts($order: PostsOrder, $first: Int, $cursor: String) {
+    posts(order: $order, first: $first, after: $cursor) {
       totalCount
       edges {
         node {
@@ -29,6 +29,12 @@ export const TODAY_POSTS_QUERY = gql`
             twitterUsername
           }
         }
+      }
+      pageInfo {
+        endCursor
+        startCursor
+        hasNextPage
+        hasPreviousPage
       }
     }
   }
