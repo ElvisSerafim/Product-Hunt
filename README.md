@@ -18,7 +18,7 @@ Built with the latest web technologies, this app provides a clean and responsive
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/product-hunt.git
+git clone https://github.com/ElvisSerafim/product-hunt.git
 cd product-hunt
 yarn
 yarn dev
