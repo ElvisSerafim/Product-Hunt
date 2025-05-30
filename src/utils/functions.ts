@@ -10,3 +10,11 @@ export const capitalize = (str: string) => {
   }
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const truncate = (str: string, maxLength: number) => {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  const truncated = str.substring(0, maxLength);
+  return truncated + "...";
+};

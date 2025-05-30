@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   try {
     const res = await fetch(
-      `${process.env.PRODUCT_HUNT_BASE_URL}/v2/oauth/token`,
+      `${process.env.NEXT_PUBLIC_PRODUCT_HUNT_BASE_URL}/v2/oauth/token`,
       {
         method: "POST",
         headers: {
@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     const data: ResponseAuth = await res.json();
     return NextResponse.json(data);
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Internal server error while obtaining token" },
       { status: 500 }
