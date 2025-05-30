@@ -2,7 +2,7 @@
 import Tabs from "@/components/ui/Tabs/Tabs";
 import { TODAY_POSTS_QUERY } from "@/graphql/clients/queries/queries";
 import { useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import PostItem from "../PostItem/PostItem";
 import { useInView } from "react-intersection-observer";
 import { PostEdge, PostsOrder } from "@/__generated__/graphql";
@@ -18,40 +18,43 @@ const PostsList: React.FC = () => {
     threshold: 0.1,
   });
 
-  const getCurrentOrder = (): PostsOrder => {
+  const currentOrder = useMemo((): PostsOrder => {
     return activeTab === "popular" ? PostsOrder.Ranking : PostsOrder.Newest;
-  };
+  }, [activeTab]);
 
   const { data, fetchMore, refetch, loading } = useQuery(TODAY_POSTS_QUERY, {
     variables: {
       first: POSTS_PER_PAGE,
-      order: getCurrentOrder(),
+      order: currentOrder,
     },
+    notifyOnNetworkStatusChange: true,
   });
-
-  useEffect(() => {
-    console.log(loading);
-  }, [loading]);
 
   const handleChangeTab = (tab: string) => {
     setActiveTab(tab);
     refetch({ first: POSTS_PER_PAGE, cursor: null, order: tab });
   };
 
-  const getPosts = () => {
+  const getPosts = useCallback(() => {
     fetchMore({
       variables: {
-        order: getCurrentOrder(),
+        order: currentOrder,
         cursor: data?.posts?.pageInfo?.endCursor,
       },
     });
+  }, [fetchMore, data?.posts?.pageInfo?.endCursor, currentOrder]);
+
+  const getSkeletons = () => {
+    return [...Array(POSTS_PER_PAGE)].map((_, idx) => (
+      <PostItemSkeleton key={idx} />
+    ));
   };
 
   useEffect(() => {
     if (inView) {
       getPosts();
     }
-  }, [inView]);
+  }, [inView, getPosts]);
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -65,19 +68,22 @@ const PostsList: React.FC = () => {
         </div>
       </div>
       <div className="flex items-start md:items-center flex-col gap-4 w-full md:p-4 px-3 py-4">
-        {loading &&
-          !data &&
-          [...Array(5)].map((_, idx) => <PostItemSkeleton key={idx} />)}
-        {data?.posts?.edges?.map((item: PostEdge, index: number) => (
-          <PostItem
-            ref={index === data.posts.edges.length - 2 ? ref : () => undefined}
-            key={`${item.node.id}-${index}`}
-            post={item.node}
-          />
-        ))}
-        {loading &&
-          !data &&
-          [...Array(5)].map((_, idx) => <PostItemSkeleton key={idx} />)}
+        {loading && !data ? (
+          getSkeletons()
+        ) : (
+          <>
+            {data?.posts?.edges?.map((item: PostEdge, index: number) => (
+              <PostItem
+                ref={
+                  index === data.posts.edges.length - 5 ? ref : () => undefined
+                }
+                key={`${item.node.id}-${index}`}
+                post={item.node}
+              />
+            ))}
+            {loading && getSkeletons()}
+          </>
+        )}
       </div>
     </div>
   );

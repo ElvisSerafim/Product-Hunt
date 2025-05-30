@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
       }
     }
   } catch (error) {
-    console.log("Error fetching token from Product Hunt");
+    console.error("Error fetching token from Product Hunt:", error);
   }
 
   return NextResponse.next();
