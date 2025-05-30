@@ -1,7 +1,7 @@
-import { PRODUCT_HUNT_ACCESS_TOKEN_COOKIE } from "@/utils/constants";
 import { ResponseAuth } from "@/utils/types";
 import { NextRequest, NextResponse } from "next/server";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(req: NextRequest) {
   try {
     const res = await fetch(
@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
 
     const data: ResponseAuth = await res.json();
     return NextResponse.json(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error while obtaining token" },
