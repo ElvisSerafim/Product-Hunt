@@ -3,6 +3,7 @@ import { HttpLink, ApolloLink, concat } from "@apollo/client";
 import { PRODUCT_HUNT_ACCESS_TOKEN_COOKIE } from "@/utils/constants";
 import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
 import { getCookie } from "cookies-next";
+import { relayStylePagination } from "@apollo/client/utilities";
 
 export function useApolloClient() {
   const httpLink = new HttpLink({
@@ -27,6 +28,14 @@ export function useApolloClient() {
 
   return new ApolloClient({
     link: concat(authMiddleware, httpLink),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            posts: relayStylePagination(["order"]),
+          },
+        },
+      },
+    }),
   });
 }
